@@ -6,21 +6,17 @@ class Customers extends Resource
 {
     public function get(array $query = [])
     {
-        $response = $this->client
+        return $this->client
                          ->get('api/customers.json', $query)
                          ->getContent();
-
-        return $response;
     }
 
     public function create(string $number, $body = [])
     {
-        $response = $this->client
-                         ->post('api/customers.json', array_merge($body, [
+        return $this->client
+                         ->post('api/customers.json', ['customer' => array_merge($body, [
                              'phone_number' => $number
-                         ]))
+                         ])])
                          ->getContent();
-
-        return $response;
     }
 }
