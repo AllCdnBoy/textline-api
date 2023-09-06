@@ -1,0 +1,33 @@
+
+-
+    request:
+        method: POST
+        url: 'https://application.textline.com/auth/sign_in.json'
+        headers:
+            Host: application.textline.com
+            Expect: null
+            Accept-Encoding: null
+            User-Agent: 'GuzzleHttp/6.3.3 curl/7.54.0 PHP/7.2.10'
+            Content-Type: application/json
+            Accept: null
+        body: '{"user":{"email":"a","password":"b"},"api_key":"c"}'
+    response:
+        status:
+            http_version: '1.1'
+            code: '401'
+            message: Unauthorized
+        headers:
+            Server: Cowboy
+            Connection: keep-alive
+            Strict-Transport-Security: max-age=31536000
+            Content-Type: 'application/json; charset=utf-8'
+            Vary: Accept-Encoding
+            X-Ua-Compatible: 'IE=Edge,chrome=1'
+            Cache-Control: no-cache
+            X-Request-Id: 5bdac3d5-2ccc-40a5-91a0-75710667c27d
+            X-Runtime: '0.014413'
+            Date: 'Sat, 23 Feb 2019 16:18:20 GMT'
+            X-Rack-Cache: 'invalidate, pass'
+            Transfer-Encoding: chunked
+            Via: '1.1 vegur'
+        body: '{"message":"Invalid API Key"}'
