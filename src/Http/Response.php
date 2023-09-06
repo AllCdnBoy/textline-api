@@ -4,46 +4,18 @@ namespace Textline\Http;
 
 class Response
 {
-    /**
-     * @var mixed
-     */
-    protected $statusCode;
 
-    /**
-     * @var mixed
-     */
-    protected $content;
-
-    /**
-     * @var array
-     */
-    protected $headers;
-
-    public function __construct($statusCode, $content, $headers = [])
-    {
-        $this->statusCode = $statusCode;
-        $this->content = $content;
-        $this->headers = $headers;
-    }
+    public function __construct(protected $statusCode, protected string $content, protected mixed $headers = []) {}
 
     /**
      * Getter for statusCode
-     *
-     * @return string
-     * @author Dom Batten <db@mettrr.com>
      */
-    public function getStatusCode()
+    public function getStatusCode(): string
     {
         return $this->statusCode;
     }
 
-    /**
-     * Getter for content
-     *
-     * @return string
-     * @author Dom Batten <db@mettrr.com>
-     */
-    public function getContent($array = false)
+    public function getContent($array = false): string
     {
         $content = json_decode($this->content, $array);
 
@@ -54,34 +26,38 @@ class Response
         return $content;
     }
 
-    /**
-     * Getter for rawContent
-     *
-     * @return string
-     */
     public function getRawContent()
     {
         return $this->content;
     }
 
-    /**
-     * Getter for headers
-     *
-     * @return string
-     */
     public function getHeaders()
     {
         return $this->headers;
     }
 
-    /**
-     * Return whether the response was successful
-     *
-     * @return bool
-     * @author Dom Batten <db@mettrr.com>
-     */
-    public function successful()
+    public function successful(): bool
     {
         return $this->statusCode < 400;
+    }
+
+    public function getErrors(): string
+    {
+        $content = json_decode($this->content);
+        if (isset($content->errors)) {
+            $buff = '';
+            foreach ($content->errors as $key => $val) {
+                if (is_array($val)) {
+                    foreach ($val as $val2) {
+                        $buff .= $key . ': ' . $val2;
+                    }
+                } else {
+                    $buff .= $key . ': ' . $val;
+                }
+            }
+            return $buff;
+        }
+
+        return $content->message;
     }
 }

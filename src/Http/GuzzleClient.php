@@ -3,39 +3,14 @@
 namespace Textline\Http;
 
 use GuzzleHttp\Client as GuzzleBaseClient;
-use GuzzleHttp\Exception\ClientException as GuzzleClientException;
-use GuzzleHttp\Exception\ServerException as GuzzleServerException;
-use Textline\Exceptions\ClientException;
 use Textline\Exceptions\AuthenticationException;
 
 class GuzzleClient implements Client
 {
-    /**
-     * @var string
-     */
-    protected $baseUri;
+    protected GuzzleBaseClient $client;
 
-    /**
-     * @var array
-     */
-    protected $headers;
-
-    /**
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * @var GuzzleBaseClient
-     */
-    protected $client;
-
-    public function __construct(string $baseUri, array $headers = [], array $config = [])
+    public function __construct(protected string $baseUri, protected array $headers = [], protected array $config = [])
     {
-        $this->baseUri = $baseUri;
-        $this->headers = $headers;
-        $this->config = $config;
-
         $this->client = new GuzzleBaseClient(array_merge($config, [
             'base_uri' => $this->baseUri,
             'headers' => $this->headers,
@@ -43,15 +18,7 @@ class GuzzleClient implements Client
         ]));
     }
 
-    /**
-     * Make a request
-     *
-     * @param string $method
-     * @param string $url
-     * @param array $body
-     * @author Dom Batten <db@mettrr.com>
-     */
-    private function request(string $method, string $url, array $body = [], array $headers = [], array $query = [])
+    private function request(string $method, string $url, array $body = [], array $headers = [], array $query = []): Response|AuthenticationException
     {
         $requestParams = [
             'json' => $body,
@@ -64,21 +31,24 @@ class GuzzleClient implements Client
         $code = $res->getStatusCode();
         $resBody = $res->getBody()->getContents();
 
-        switch ($code)
-        {
+        switch ($code) {
             // catch authentication exceptions as the rest of the app will fail
             case 401:
                 throw new AuthenticationException($resBody);
-                break;
-
-            // 404 errors returned in html so make the response a bit more
-            // useable
             case 404:
                 $resBody = json_encode([
                     'success' => false,
                     'error' => true,
                     'message' => 'Resource not found'
                 ]);
+                break;
+
+            case 400:
+                $resBody = json_encode(array_merge([
+                    'success' => false,
+                    'error' => true,
+                    'message' => 'Error in fields.  See Error list',
+                ], (array)json_decode($resBody)));
                 break;
 
             default:
@@ -92,54 +62,39 @@ class GuzzleClient implements Client
         );
     }
 
-    public function post(string $url, array $body = [], array $headers = [])
+    public function post(string $url, array $body = [], array $headers = []): Response
     {
         return $this->request('post', $url, $body, $headers);
     }
 
-    public function put(string $url, array $body = [], array $headers = [])
+    public function put(string $url, array $body = [], array $headers = []): Response
     {
         return $this->request('put', $url, $body, $headers);
     }
 
-    public function get(string $url, array $query = [], array $headers = [])
+    public function get(string $url, array $query = [], array $headers = []): Response
     {
         return $this->request('get', $url, [], $headers, $query);
     }
 
-    public function setHeader(string $header, string $value)
+    public function setHeader(string $header, string $value): static
     {
         $this->headers[$header] = $value;
 
         return $this;
     }
 
-    /**
-     * Getter for baseUri
-     *
-     * @return string
-     */
-    public function getBaseUri()
+    public function getBaseUri(): string
     {
         return $this->baseUri;
     }
 
-    /**
-     * Getter for headers
-     *
-     * @return string
-     */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
 
-    /**
-     * Getter for config
-     *
-     * @return string
-     */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->config;
     }
