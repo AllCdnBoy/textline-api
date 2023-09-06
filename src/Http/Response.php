@@ -15,7 +15,7 @@ class Response
         return $this->statusCode;
     }
 
-    public function getContent($array = false): string
+    public function getContent($array = false): mixed
     {
         $content = json_decode($this->content, $array);
 
