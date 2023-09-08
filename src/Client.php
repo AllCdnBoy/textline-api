@@ -4,62 +4,29 @@ namespace Textline;
 
 use Textline\Http\Client as HttpClient;
 use Textline\Http\GuzzleClient;
-use Textline\Resources\Conversation;
-use Textline\Resources\Conversations;
-use Textline\Resources\Customer;
-use Textline\Resources\Customers;
-use Textline\Resources\Organization;
+use Textline\Resources\{Conversation, Conversations, Customer, Customers, Organization};
 
 class Client
 {
-    /**
-     * @var string
-     */
-    protected $email;
 
-    /**
-     * @var string
-     */
-    protected $password;
+    protected string $baseUri = 'https://application.textline.com/';
 
-    /**
-     * @var string
-     */
-    protected $apiKey;
-
-    /**
-     * @var string
-     */
-    protected $token;
-
-    /**
-     * @var array
-     */
-    protected $headers;
-
-    /**
-     * @var HttpClient
-     */
-    protected $client;
-
-    /**
-     * @var string
-     */
-    protected $baseUri = 'https://application.textline.com/';
-
-    public function __construct(string $email, string $password, string $apiKey, string $token = null, array $headers = [], HttpClient $client = null, array $clientConfig = [])
+    public function __construct(
+        protected string      $email,
+        protected string      $password,
+        protected string      $apiKey,
+        protected ?string     $token = null,
+        protected array       $headers = [],
+        protected ?HttpClient $client = null,
+        array                 $clientConfig = []
+    )
     {
-        $this->email = $email;
-        $this->password = $password;
-        $this->apiKey = $apiKey;
-        $this->token = $token;
-        $this->headers = $headers;
         $this->client = $client ?? new GuzzleClient($this->baseUri, $this->headers, $clientConfig);
 
         $token ? $this->setAuth($this->token) : $this->auth();
     }
 
-    public function auth()
+    public function auth(): static
     {
         $response = $this->client->post('auth/sign_in.json', [
             'user' => [
@@ -83,67 +50,47 @@ class Client
         return $this;
     }
 
-    public function conversations()
+    public function conversations(): Conversations
     {
         return new Conversations($this->client);
     }
 
-    public function conversation(string $uuid)
+    public function conversation(string $uuid): Conversation
     {
         return new Conversation($this->client, $uuid);
     }
 
-    public function customers()
+    public function customers(): Customers
     {
         return new Customers($this->client);
     }
 
-    public function customer(string $uuid)
+    public function customer(string $uuid): Customer
     {
         return new Customer($this->client, $uuid);
     }
 
-    public function organization()
+    public function organization(): Organization
     {
         return new Organization($this->client);
     }
 
-    /**
-     * Getter for email
-     *
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    /**
-     * Getter for password
-     *
-     * @return string
-     */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    /**
-     * Getter for apiKey
-     *
-     * @return string
-     */
-    public function getApiKey()
+    public function getApiKey(): string
     {
         return $this->apiKey;
     }
 
-    /**
-     * Getter for token
-     *
-     * @return string
-     */
-    public function getToken()
+    public function getToken(): ?string
     {
         return $this->token;
     }

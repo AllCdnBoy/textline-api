@@ -6,13 +6,5 @@ use Textline\Http\Client as HttpClient;
 
 abstract class Resource
 {
-    /**
-     * @var HttpClient $client
-     */
-    protected $client;
-
-    public function __construct(HttpClient $client)
-    {
-        $this->client = $client;
-    }
+    public function __construct(protected HttpClient $client) {}
 }
