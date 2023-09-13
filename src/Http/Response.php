@@ -7,9 +7,6 @@ class Response
 
     public function __construct(protected $statusCode, protected string $content, protected mixed $headers = []) {}
 
-    /**
-     * Getter for statusCode
-     */
     public function getStatusCode(): string
     {
         return $this->statusCode;

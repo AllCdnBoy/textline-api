@@ -8,7 +8,6 @@ use Textline\Resources\{Conversation, Conversations, Customer, Customers, Organi
 
 class Client
 {
-
     protected string $baseUri = 'https://application.textline.com/';
 
     public function __construct(

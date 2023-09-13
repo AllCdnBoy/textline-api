@@ -33,9 +33,7 @@ class Message
 
     public function getBody()
     {
-        $body = ['comment' =>
-            $this->messageBody
-        ];
+        $body = ['comment' => $this->messageBody];
 
         if ($this->attachments) {
             $body['attachments'] = $this->attachments;
